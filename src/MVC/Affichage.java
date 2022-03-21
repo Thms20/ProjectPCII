@@ -1,10 +1,13 @@
 package MVC;
 
-import Environnement.Ressource;
-import Unites.Unite;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
 import java.util.ArrayList;
+
+import Environnement.Ressource;
+import Unites.Ouvrier;
+import Unites.Unite;
 
 
 public class Affichage extends Grille {
@@ -29,6 +32,7 @@ public class Affichage extends Grille {
 			}
 		}
 		setAllRessources();
+	    setAllUnit();
 		this.setBackground(Color.orange);
 	}
 
@@ -37,8 +41,14 @@ public class Affichage extends Grille {
 	 */
 	public void setAllRessources() {
 		for (Ressource r : this.etat.getListRessource()) {
-			System.out.println("x = " + r.getPosition().x + " " + "y = " + r.getPosition().y);
 			this.plateau[r.getPosition().x][r.getPosition().y].setRessource(r);
+		}
+	}
+	
+	public void setAllUnit() {
+		for(Unite u : etat.getJoueurs().get(0).getUnites()) {
+			this.plateau[u.getPos().x][u.getPos().y].setUnit(u);
+			
 		}
 	}
 
@@ -51,12 +61,12 @@ public class Affichage extends Grille {
 		ajouteElement(plateau[pos.x][pos.y]);
 	}
   
-  	@Override
+ /* 	@Override
 	public void paint(Graphics g) {
 		for(Unite u : etat.getJoueurs().get(0).getUnites()) {
 			if(u instanceof Ouvrier) {
 				((Ouvrier) u).paintComponent(g);
 			}
 		}
-	}
+	} */
 }

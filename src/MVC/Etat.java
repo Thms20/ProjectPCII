@@ -1,16 +1,16 @@
 package MVC;
 
-import Batiments.Caserne;
-import Environnement.Carte;
-import Environnement.Ressource;
-import Joueurs.AIPlayer;
-import Joueurs.Joueur;
-
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import Batiments.Caserne;
+import Environnement.Carte;
+import Environnement.Ressource;
+import Joueurs.AIPlayer;
+import Joueurs.Joueur;
 
 public class Etat {
 	private Carte carte = new Carte();
@@ -113,6 +113,10 @@ public class Etat {
 
 	public AIPlayer getAI() {
 		return ordi;
+	}
+	
+	public Affichage getAff() {
+		return aff;
 	}
 
 	public void createCaserne(Joueur joueur, Point pos) {
