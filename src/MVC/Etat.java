@@ -125,7 +125,7 @@ public class Etat {
 			}
 		}, 1000, 1000);
 		if (tempspassee == tempsConstruc) {
-			joueur.addBat(new Caserne(pos, carte, joueur));
+			joueur.addBat(new Caserne(pos, joueur));
 			timer.cancel();
 			tempspassee = 0;
 		}
