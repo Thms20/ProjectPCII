@@ -5,6 +5,8 @@ import java.awt.Point;
 public class Ouvrier extends Unite {
 	private Point position;
 	private Point posFinal = null;
+	
+	private int vie = 100;
     
 	public Ouvrier() {
 	}

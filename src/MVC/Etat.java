@@ -9,9 +9,9 @@ import java.util.TimerTask;
 import Batiments.Caserne;
 import Environnement.Carte;
 import Environnement.Ressource;
+import Environnement.typeRessource;
 import Joueurs.AIPlayer;
 import Joueurs.Joueur;
-import Unites.Ouvrier;
 import Unites.Unite;
 
 public class Etat {
@@ -63,7 +63,6 @@ public class Etat {
 	public void initRessources() {
 		Random rand = new Random();
 		int nbRessources = rand.nextInt(40) + 20;
-		System.out.println("Nb ressources qu'on souhaite initialiser : "+nbRessources);
 		while(nbRessources != 0) {
 			boolean tempB = true;
 			Ressource temp = new Ressource();
@@ -85,7 +84,6 @@ public class Etat {
 			}
 
 		}
-		System.out.println("Nb ressources present dans la liste de ressources : "+this.listRessource.size());
 	}
 	
 	public void threadRessource()
@@ -109,8 +107,6 @@ public class Etat {
 					if(tempB)
 					{
 						this.listRessource.add(r); // ajoute de la nouvelle ressource a la liste de ressources.
-						System.out.println(this.listRessource.size());
-						System.out.println("Coordonnee de la ressource ajouter : "+r.getPosition());
 						this.aff.getPlateau()[r.getPosition().x][r.getPosition().y].setRessource(r); // ajout de la nouvelles ressource au plateau de jeu.
 						this.aff.refreshReesources(); // appel pour actualiser l'affichage graphique.
 					}
@@ -139,6 +135,19 @@ public class Etat {
 					for(Unite u : j.getUnites()) {
 						Case c = this.aff.getPlateau()[u.getPos().x][u.getPos().y];
 						c.setUnit(u);
+						
+						if(c.estOccupeeRessource()) { // Je regarde si la case contient une ressource si c'est le cas alors je l'enleve et augmente le score du joueur
+						Ressource r = c.removeRessource();
+						if (r.gettR() == typeRessource.bois) {
+							j.setNbBois(1);
+							System.out.println("nombre de bois : " + j.getNbBois());
+						}
+						else {
+							j.setNbNourritures(1);
+							System.out.println("nombre de nourriture : " + j.getNbNourritures());
+						}
+					  
+					 } 
 					//	this.aff.refreshUnit();
 					}
 				}
@@ -185,7 +194,6 @@ public class Etat {
 	public void unitADeplacer() {
 		Case c = this.getAff().getPlateau()[posInitial.x][posInitial.y];
     	Unite u = c.getUnit();
-    	System.out.println(posInitial);
    // 	c.removeUnit();  	
     	u.setPosFinal(posfinal);
     	if(!u.isAlive()) {

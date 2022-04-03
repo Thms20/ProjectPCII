@@ -46,11 +46,11 @@ public class Joueur {
 	}
 
 	public void setNbBois(int bois) {
-		nbBois = bois;
+		nbBois += bois;
 	}
 
 	public void setNbNourritures(int nourriture) {
-		nbNourritures = nourriture;
+		nbNourritures += nourriture;
 	}
 
 	public ArrayList<Ouvrier> getOuvrieres(){

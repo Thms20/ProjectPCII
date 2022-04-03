@@ -74,6 +74,14 @@ public class Case extends ZoneCliquable {
         this.occupeeRessource = true;
     }
     
+    public Ressource removeRessource() {
+    	Ressource r = this.ressource;
+    	this.ressource = null;
+    	this.occupeeRessource = false;
+    	
+    	return r;
+    }
+    
     
     public boolean estOccupeUnit() {
     	return this.occupeUnite;
@@ -122,7 +130,6 @@ public class Case extends ZoneCliquable {
     
     public void clicDroit(MouseEvent e) {
     	super.getEtat().posInitial = posInGrid;
-    	System.out.println(posInGrid);
     	
     }
     
