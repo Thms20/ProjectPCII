@@ -11,6 +11,8 @@ import Environnement.Carte;
 import Environnement.Ressource;
 import Joueurs.AIPlayer;
 import Joueurs.Joueur;
+import Unites.Ouvrier;
+import Unites.Unite;
 
 public class Etat {
 	private Carte carte = new Carte();
@@ -21,7 +23,10 @@ public class Etat {
 	private ArrayList<Ressource> listRessource = new ArrayList<>();
 	private Timer timer = new Timer();
 	private int tempspassee = 0;
-
+	
+	public Point posInitial = null;
+	public Point posfinal = null;
+	
 	public Etat(Affichage a) {
 		aff = a;
 		joueurs = new ArrayList<Joueur>();
@@ -81,29 +86,71 @@ public class Etat {
 
 		}
 		System.out.println("Nb ressources present dans la liste de ressources : "+this.listRessource.size());
-		// ajout de ressource toutes les 2 secs
-		/*new Thread(() ->
+	}
+	
+	public void threadRessource()
+	{
+		new Thread(() ->
 		{
 			while(true)
 			{
-				if(this.listRessource.size() < 60) {
-					Ressource r = new Ressource();
+				boolean tempB = true;
+				Ressource r = new Ressource();
+				if(this.listRessource.size() < 60)
+				{
 					for (Ressource res : this.listRessource)
 					{
 						if (r.getPosition().x == res.getPosition().x && r.getPosition().y == res.getPosition().y)
+						{
+							tempB = false;
 							break;
+						}
 					}
-					this.listRessource.add(r);
-					this.aff.setAllRessources();
+					if(tempB)
+					{
+						this.listRessource.add(r); // ajoute de la nouvelle ressource a la liste de ressources.
+						System.out.println(this.listRessource.size());
+						System.out.println("Coordonnee de la ressource ajouter : "+r.getPosition());
+						this.aff.getPlateau()[r.getPosition().x][r.getPosition().y].setRessource(r); // ajout de la nouvelles ressource au plateau de jeu.
+						this.aff.refreshReesources(); // appel pour actualiser l'affichage graphique.
+					}
 				}
 				try
 				{
-					Thread.sleep(3000);
+					Thread.sleep(2500);
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
-		}).start();*/
+		}).start();
+	}
+	
+	public void threadUnit() {
+		new Thread(() -> {
+			while(true) {
+				for(Case[] tabCase : this.aff.getPlateau()) {
+					for(Case c : tabCase) {
+						if(c.estOccupeUnit()) {
+							c.removeUnit();
+						}
+					}
+				}
+				for(Joueur j : joueurs) {
+					for(Unite u : j.getUnites()) {
+						Case c = this.aff.getPlateau()[u.getPos().x][u.getPos().y];
+						c.setUnit(u);
+					//	this.aff.refreshUnit();
+					}
+				}
+
+				try {
+					Thread.sleep(1000);
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}).start();
 	}
 
 	public ArrayList<Ressource> getListRessource()
@@ -133,6 +180,18 @@ public class Etat {
 			timer.cancel();
 			tempspassee = 0;
 		}
+	}
+	
+	public void unitADeplacer() {
+		Case c = this.getAff().getPlateau()[posInitial.x][posInitial.y];
+    	Unite u = c.getUnit();
+    	System.out.println(posInitial);
+   // 	c.removeUnit();  	
+    	u.setPosFinal(posfinal);
+    	if(!u.isAlive()) {
+    		u.start();
+    	}
+    	posInitial = posfinal;
 	}
 
 }

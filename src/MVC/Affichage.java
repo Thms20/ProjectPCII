@@ -1,12 +1,11 @@
 package MVC;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
 
 import Environnement.Ressource;
-import Unites.Ouvrier;
+import Joueurs.Joueur;
 import Unites.Unite;
 
 
@@ -27,13 +26,15 @@ public class Affichage extends Grille {
 
 		for (int x = 0; x < plateau.length; x++) {
 			for (int y = 0; y < plateau[x].length; y++) {
-				this.plateau[x][y] = new Case(etat);
+				this.plateau[x][y] = new Case(etat, new Point(x, y));
 				ajouteElement(this.plateau[x][y]);
 			}
 		}
-		setAllRessources();
+		this.setAllRessources();
 	    setAllUnit();
 		this.setBackground(Color.orange);
+		this.etat.threadUnit();
+		this.etat.threadRessource();
 	}
 
 	/**
@@ -45,10 +46,38 @@ public class Affichage extends Grille {
 		}
 	}
 	
+	
+
+	/**
+	 * Methode pour actualiser l'affichage graphique.
+	 */
+	public void refreshReesources()
+	{
+		for(Case[] tabCase : this.plateau)
+		{
+			for(Case c : tabCase)
+			{
+				// repaint seulement les cases ou il y'a une ressource.
+				if(c.estOccupeeRessource())
+					c.repaint();
+			}
+		}
+	}
+	
 	public void setAllUnit() {
 		for(Unite u : etat.getJoueurs().get(0).getUnites()) {
 			this.plateau[u.getPos().x][u.getPos().y].setUnit(u);
 			
+		}
+	}
+	
+	public void refreshUnit() {
+		for(Case[] tabCase : this.plateau) {
+			for(Case c : tabCase) {
+				if(c.estOccupeUnit()) {
+					c.repaint();
+				}
+			}
 		}
 	}
 
@@ -56,10 +85,10 @@ public class Affichage extends Grille {
 		return plateau;
 	}
 
-	public void setCase(Point pos) {
+/*	public void setCase(Point pos) {
 		plateau[pos.x][pos.y] = new Case(etat);
 		ajouteElement(plateau[pos.x][pos.y]);
-	}
+	} */
   
  /* 	@Override
 	public void paint(Graphics g) {

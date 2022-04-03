@@ -17,6 +17,7 @@ public class Joueur {
 	public Joueur() {
 		nbBois = 100;
 		nbNourritures = 100;
+		listUnit.add(new Ouvrier(new Point(14, 0)));
 		listUnit.add(new Ouvrier(new Point(0, 14)));
 	}
 	
