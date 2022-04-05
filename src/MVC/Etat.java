@@ -7,11 +7,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import Batiments.Caserne;
+import Batiments.Fourmiliere;
 import Environnement.Carte;
 import Environnement.Ressource;
 import Environnement.typeRessource;
 import Joueurs.AIPlayer;
 import Joueurs.Joueur;
+import Unites.Combattante;
 import Unites.Unite;
 
 public class Etat {
@@ -126,30 +128,36 @@ public class Etat {
 			while(true) {
 				for(Case[] tabCase : this.aff.getPlateau()) {
 					for(Case c : tabCase) {
-						if(c.estOccupeUnit()) {
+						if (c.estOccupeUnit()) {
 							c.removeUnit();
+						}
+						if (c.estOccupeeCombattante()) {
+							c.removeCombattante();
 						}
 					}
 				}
 				for(Joueur j : joueurs) {
 					for(Unite u : j.getUnites()) {
 						Case c = this.aff.getPlateau()[u.getPos().x][u.getPos().y];
-						c.setUnit(u);
-						
-						if(c.estOccupeeRessource()) { // Je regarde si la case contient une ressource si c'est le cas alors je l'enleve et augmente le score du joueur
-						Ressource r = c.removeRessource();
-						if (r.gettR() == typeRessource.bois) {
-							j.setNbBois(1);
-							System.out.println("nombre de bois : " + j.getNbBois());
+						if (u instanceof Combattante) {
+							c.setCombattante((Combattante) u);
 						}
 						else {
-							j.setNbNourritures(1);
-							System.out.println("nombre de nourriture : " + j.getNbNourritures());
-						}
-					  
-					 } 
+							c.setUnit(u);
+						
+						    if(c.estOccupeeRessource()) { // Je regarde si la case contient une ressource si c'est le cas alors je l'enleve et augmente le score du joueur
+						    	Ressource r = c.removeRessource();
+						    	if (r.gettR() == typeRessource.bois) {
+						    		System.out.println("nombre de bois : " + j.getNbBois());
+						    		}
+						    	else {
+						    		j.setNbNourritures(1);
+						    		System.out.println("nombre de nourriture : " + j.getNbNourritures());
+						    		}
+						    	} 
 					//	this.aff.refreshUnit();
-					}
+						    }
+						}
 				}
 
 				try {
@@ -175,7 +183,7 @@ public class Etat {
 		return aff;
 	}
 
-	public void createCaserne(Joueur joueur, Point pos) {
+	/* public void createCaserne(Joueur joueur, Point pos) {
 		int tempsConstruc = 10;
 		timer.schedule(new TimerTask() {
 			@Override
@@ -189,17 +197,40 @@ public class Etat {
 			timer.cancel();
 			tempspassee = 0;
 		}
-	}
+	} */
 	
 	public void unitADeplacer() {
 		Case c = this.getAff().getPlateau()[posInitial.x][posInitial.y];
-    	Unite u = c.getUnit();
-   // 	c.removeUnit();  	
-    	u.setPosFinal(posfinal);
-    	if(!u.isAlive()) {
-    		u.start();
-    	}
-    	posInitial = posfinal;
+		Unite u = null;
+		if(c.estOccupeUnit()) {
+			u = c.getUnit();
+		}
+		else if(c.estOccupeeCombattante())
+			u = c.getCombattante();
+		System.out.println("pos :"+u.getPos());
+		u.setPosFinal(posfinal);
+		if(!u.isAlive()) {
+			u.start();
+		}
+		posInitial = posfinal;
 	}
+	
+	
+	public void setCombattantePlateau(Combattante c){
+		this.joueurs.get(0).addUnite(c);
+		this.aff.getPlateau()[c.getPos().x][c.getPos().y].setCombattante(c);
+	}
+	
+	public void setFourmilierePlateau(Fourmiliere f){
+		this.joueurs.get(0).addBat(f);
+		this.aff.getPlateau()[f.getPosition().x][f.getPosition().y].setFourmiliere(f);
+	}
+	
+	public void setCasernePlateau(Caserne c){
+		this.joueurs.get(0).addBat(c);
+		this.aff.getPlateau()[c.getPosition().x][c.getPosition().y].setCaserne(c);
+	}
+	
+	
 
 }

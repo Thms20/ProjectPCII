@@ -4,8 +4,10 @@ import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import Batiments.Caserne;
+import Batiments.Fourmiliere;
 import Environnement.Ressource;
-import Joueurs.Joueur;
+import Unites.Combattante;
 import Unites.Unite;
 
 
@@ -35,6 +37,9 @@ public class Affichage extends Grille {
 		this.setBackground(Color.orange);
 		this.etat.threadUnit();
 		this.etat.threadRessource();
+		this.etat.setCombattantePlateau(new Combattante(new Point(13, 1)));
+		this.etat.setFourmilierePlateau(new Fourmiliere(new Point(14, 1)));
+		this.etat.setCasernePlateau(new Caserne(new Point(0, 13)));
 	}
 
 	/**
