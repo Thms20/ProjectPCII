@@ -18,6 +18,7 @@ import Batiments.Fourmiliere;
 import Environnement.Ressource;
 import Environnement.typeRessource;
 import Unites.Combattante;
+import Unites.CombattanteAI;
 import Unites.Ouvrier;
 import Unites.Unite;
 
@@ -31,6 +32,9 @@ public class Case extends ZoneCliquable {
     
     private Combattante c = null;
     private boolean occupeCombattante = false;
+    
+    private CombattanteAI combattanteAI = null;
+    private boolean occupeCombattanteAI = false;
     
     private Fourmiliere f = null;
     private boolean occupeFourmiliere = false;
@@ -63,6 +67,9 @@ public class Case extends ZoneCliquable {
         if(this.occupeUnite) {
         	drawUnit(g);
         }
+        if(this.occupeCombattanteAI) {
+            drawCombattanteAI(g);
+        }
         if(this.estOccupeFourmiliere()) {
         	drawFourmiliere(g);
         }
@@ -71,6 +78,8 @@ public class Case extends ZoneCliquable {
         }
     }
     
+    
+    public boolean estOccupeeCombattanteAI() { return this.occupeCombattanteAI; }
     
     public boolean estOccupeeCombattante() { return this.occupeCombattante; }
     
@@ -104,6 +113,16 @@ public class Case extends ZoneCliquable {
         }
     }
     
+    
+    public void drawCombattanteAI(Graphics g) {
+    	try {
+            Image image = ImageIO.read(new File("C:\\Users\\Thomas\\Desktop\\pcii\\ProjectPCII\\src\\Ressources\\combattanteAI.jpg"));
+            g.drawImage(image, 0, 0, 1353/35, 1076/20, this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     public void setCombattante(Combattante c){
         this.c = c;
         this.occupeCombattante = true;
@@ -117,6 +136,22 @@ public class Case extends ZoneCliquable {
     public Combattante getCombattante(){
         return this.c;
     }
+    
+    
+    public void setCombattanteAI(CombattanteAI c){
+        this.combattanteAI = c;
+        this.occupeCombattanteAI = true;
+    }
+
+    public void removeCombattanteAI(){
+        this.combattanteAI = null;
+        this.occupeCombattanteAI = false;
+    }
+    
+    public CombattanteAI getCombattanteAI(){
+        return this.combattanteAI;
+    }
+    
 
     public void setRessource(Ressource r)
     {
@@ -229,15 +264,25 @@ public class Case extends ZoneCliquable {
         }
         else {
         	if(estOccupeFourmiliere()) {
-        		super.getEtat().getJoueurs().get(0).addUnite(new Ouvrier(new Point(14, 2)));
-        		super.getEtat().getJoueurs().get(0).setNbNourritures(-10);
-        	    System.out.println("Vous generez une ouvriere : - 10 de nourriture ! Votre nombre de nourriture : " + super.getEtat().getJoueurs().get(0).getNbNourritures());
+        		if(!(super.getEtat().getJoueurs().get(0).getNbNourritures() < 10)) {
+        			super.getEtat().getJoueurs().get(0).addUnite(new Ouvrier(new Point(14, 2)));
+        			super.getEtat().getJoueurs().get(0).setNbNourritures(-10);
+        			System.out.println("Vous generez une ouvriere : - 10 de nourriture ! Votre nombre de nourriture : " + super.getEtat().getJoueurs().get(0).getNbNourritures());
+        		}
+        		else {
+        			System.out.println("Vous n'avez pas assez de nourritures !");
+        		}
         		
         	}
         	else if(estOccupeCaserne()) {
-        		super.getEtat().getJoueurs().get(0).addUnite(new Combattante(new Point(0, 12)));
-        		super.getEtat().getJoueurs().get(0).setNbBois(-20);
-        	    System.out.println("Vous generez une ouvriere : - 20 de bois ! Votre nombre de bois : " + super.getEtat().getJoueurs().get(0).getNbBois());
+        		if(!(super.getEtat().getJoueurs().get(0).getNbBois() < 20)) {
+        			super.getEtat().getJoueurs().get(0).addUnite(new Combattante(new Point(13, 1)));
+        			super.getEtat().getJoueurs().get(0).setNbBois(-20);
+        			System.out.println("Vous generez une ouvriere : - 20 de bois ! Votre nombre de bois : " + super.getEtat().getJoueurs().get(0).getNbBois());
+        		}
+        		else {
+        			System.out.println("Vous n'avez pas assez de bois !");
+        		}
         	}
         	else {
         		clicGauche(e);

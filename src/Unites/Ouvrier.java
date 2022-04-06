@@ -71,11 +71,5 @@ public class Ouvrier extends Unite {
 	public void setPosFinal(Point p) {
 		posFinal = p;
 	}
-	
-/*	public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.setColor(Color.CYAN);
-        g.fillOval(position.x*10, position.y*10, 15, 15);
-} */
 
 }

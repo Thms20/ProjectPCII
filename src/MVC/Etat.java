@@ -4,7 +4,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
-import java.util.TimerTask;
+
+import javax.swing.JOptionPane;
 
 import Batiments.Caserne;
 import Batiments.Fourmiliere;
@@ -14,6 +15,7 @@ import Environnement.typeRessource;
 import Joueurs.AIPlayer;
 import Joueurs.Joueur;
 import Unites.Combattante;
+import Unites.CombattanteAI;
 import Unites.Unite;
 
 public class Etat {
@@ -34,6 +36,9 @@ public class Etat {
 		joueurs = new ArrayList<Joueur>();
 		Joueur j1 = new Joueur();
 		joueurs.add(j1);
+		
+		ordi = new AIPlayer(this);
+		
 		initCarte();
 		initRessources();
 	}
@@ -134,6 +139,9 @@ public class Etat {
 						if (c.estOccupeeCombattante()) {
 							c.removeCombattante();
 						}
+						if (c.estOccupeeCombattanteAI()) {
+							c.removeCombattanteAI();
+						}
 					}
 				}
 				for(Joueur j : joueurs) {
@@ -158,6 +166,21 @@ public class Etat {
 					//	this.aff.refreshUnit();
 						    }
 						}
+				}
+				
+				
+				for(CombattanteAI u : ordi.getUnit()) {
+					Case c = this.aff.getPlateau()[u.getPos().x][u.getPos().y];
+					c.setCombattanteAI(u);
+				}
+				
+				
+				//Verification de fin partie
+				if(joueurs.get(0).getNbNourritures() >= 110) {
+					win();
+				}
+				else if(joueurs.get(0).getNbNourritures() < 10 && (joueurs.get(0).getNbBois() < 20 && joueurs.get(0).getUnites().size() == 0)) {
+					lose();
 				}
 
 				try {
@@ -221,6 +244,10 @@ public class Etat {
 		this.aff.getPlateau()[c.getPos().x][c.getPos().y].setCombattante(c);
 	}
 	
+	public void setCombattanteAIPlateau(CombattanteAI c) {
+		this.aff.getPlateau()[c.getPos().x][c.getPos().y].setCombattanteAI(c);
+	}
+	
 	public void setFourmilierePlateau(Fourmiliere f){
 		this.joueurs.get(0).addBat(f);
 		this.aff.getPlateau()[f.getPosition().x][f.getPosition().y].setFourmiliere(f);
@@ -229,6 +256,19 @@ public class Etat {
 	public void setCasernePlateau(Caserne c){
 		this.joueurs.get(0).addBat(c);
 		this.aff.getPlateau()[c.getPosition().x][c.getPosition().y].setCaserne(c);
+	}
+	
+	
+	public void win() {
+		JOptionPane fin = new JOptionPane();
+		String s = "Vous avez assez de rations pour l'hiver pour votre fourmiliere, BRAVO !";
+		fin.showConfirmDialog(aff, s, "Victoire!", JOptionPane.DEFAULT_OPTION);
+	}
+	
+	public void lose() {
+		JOptionPane fin = new JOptionPane();
+		String s = "Vous avez perdu !";
+		fin.showConfirmDialog(aff, s, "Defaite !", JOptionPane.DEFAULT_OPTION);
 	}
 	
 	
