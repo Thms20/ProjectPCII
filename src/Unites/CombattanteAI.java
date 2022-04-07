@@ -10,6 +10,7 @@ public class CombattanteAI extends Unite{
 	private Point posEnemy = null;
 	
 	private int vie = 100;
+	protected final int ATK = 10;
     
 	public CombattanteAI() {
 	}
@@ -86,5 +87,22 @@ public class CombattanteAI extends Unite{
 		
 		setPosFinal(posEnemy);
 	}
+	
+	public void setID(int i) {
+        idEnemy = i;
+    }
+	
+	
+	public void setVie(int v) {
+        this.vie = v;
+    }
+
+    public int getVie() {
+        return this.vie;
+    }
+    
+    public int getAttack(){
+        return this.ATK;
+    }
 	
 }

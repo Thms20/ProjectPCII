@@ -55,10 +55,6 @@ public class Ouvrier extends Unite {
 					position =  new Point(position.x, position.y - 1);
 				}
 				
-			/*	if(posFinal.x == position.x && posFinal.y == position.y) {
-					posFinal = null;
-				} */
-	//		}
 			try {
 				Thread.sleep(2000);
 			} catch(Exception e) {
@@ -67,9 +63,19 @@ public class Ouvrier extends Unite {
 		}
 	}
 	
-	@Override
+
 	public void setPosFinal(Point p) {
 		posFinal = p;
+	}
+	
+	@Override
+	public void setVie(int v) {
+		this.vie = v;
+	}
+	
+    @Override
+	public int getVie() {
+		return this.vie;
 	}
 
 }

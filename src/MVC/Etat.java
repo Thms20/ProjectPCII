@@ -16,6 +16,7 @@ import Joueurs.AIPlayer;
 import Joueurs.Joueur;
 import Unites.Combattante;
 import Unites.CombattanteAI;
+import Unites.Ouvrier;
 import Unites.Unite;
 
 public class Etat {
@@ -52,10 +53,6 @@ public class Etat {
 			carte.getListeUnite().add(j.getUnites());
 		}
 	}
-
-	//public void initPlayer(Joueur player){
-	//	joueur = player;
-	//}
 
 	public Carte getCarte() {
 		return carte;
@@ -156,6 +153,7 @@ public class Etat {
 						    if(c.estOccupeeRessource()) { // Je regarde si la case contient une ressource si c'est le cas alors je l'enleve et augmente le score du joueur
 						    	Ressource r = c.removeRessource();
 						    	if (r.gettR() == typeRessource.bois) {
+						    		j.setNbBois(1);
 						    		System.out.println("nombre de bois : " + j.getNbBois());
 						    		}
 						    	else {
@@ -192,6 +190,103 @@ public class Etat {
 			
 		}).start();
 	}
+	
+	
+	public void threadAttaqueJoueur(){
+		new Thread(() -> {
+			while(true){
+				ArrayList<Unite> listUniteJ = this.joueurs.get(0).getUnites();
+				ArrayList<CombattanteAI> listUniteE = this.ordi.getUnit();
+				ArrayList<Point> temp = new ArrayList<Point>();
+				for(Unite uJ : listUniteJ){
+					for(Unite uAI : listUniteE){
+						if(uJ instanceof Combattante){
+							Point p1 = uJ.getPos();
+							Point p2 = uAI.getPos();
+							int xValide = Math.abs(p1.x - p2.x);
+							int yValide = Math.abs(p1.y - p2.y);
+							if(xValide <= 1 && yValide <= 1){
+								uAI.setVie(uAI.getVie()-((Combattante) uJ).getAttack());
+								System.out.println(uAI.getVie());
+								if(uAI.getVie() <= 0){
+									temp.add(uAI.getPos());
+								}
+							}
+						}
+					}
+				}
+				for(Point p : temp){
+					this.getAI().getUnit().remove(this.aff.getPlateau()[p.x][p.y].getCombattanteAI());
+					this.aff.getPlateau()[p.x][p.y].removeCombattanteAI();
+				}
+				try {
+					Thread.sleep(1500);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
+	}
+
+	
+	
+	
+	public void threadAttaqueAI(){
+		new Thread(() -> {
+			while(true){
+				ArrayList<Unite> listUniteJ = this.joueurs.get(0).getUnites();
+				ArrayList<CombattanteAI> listUniteE = this.ordi.getUnit();
+				ArrayList<Point> temp = new ArrayList<Point>();
+
+				for(Unite uAI : listUniteE){
+					for(Unite uJ : listUniteJ){
+						if(uJ instanceof Combattante){
+							Point p1 = uJ.getPos();
+							Point p2 = uAI.getPos();
+							int xValide = Math.abs(p1.x - p2.x);
+							int yValide = Math.abs(p1.y - p2.y);
+							if(xValide <= 1 && yValide <= 1){
+								uJ.setVie(uJ.getVie() - ((CombattanteAI) uAI).getAttack());
+								//System.out.println(uJ.getVie());
+								if(uJ.getVie() <= 0) {
+									temp.add(uJ.getPos());
+								}
+							}
+						}
+						else if(uJ instanceof Ouvrier){
+							Point p1 = uJ.getPos();
+							Point p2 = uAI.getPos();
+							int xValide = Math.abs(p1.x - p2.x);
+							int yValide = Math.abs(p1.y - p2.y);
+							if(xValide <= 1 && yValide <= 1){
+								uJ.setVie(uJ.getVie() - ((CombattanteAI) uAI).getAttack());
+						//		System.out.println(uJ.getVie());
+								if(uJ.getVie() <= 0) {
+									temp.add(uJ.getPos());
+								}
+							}
+						}
+					}
+				}
+				for(Point p : temp){
+					Case c = this.aff.getPlateau()[p.x][p.y];
+					if(c.estOccupeUnit()){
+						this.getJoueurs().get(0).getUnites().remove(this.aff.getPlateau()[p.x][p.y].getUnit());
+						this.aff.getPlateau()[p.x][p.y].removeUnit();
+					}
+					else {
+						this.getJoueurs().get(0).getUnites().remove(this.aff.getPlateau()[p.x][p.y].getCombattante());
+						this.aff.getPlateau()[p.x][p.y].removeCombattante();
+					}
+				}
+				try {
+					Thread.sleep(1500);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
+	}
 
 	public ArrayList<Ressource> getListRessource()
 	{
@@ -205,22 +300,6 @@ public class Etat {
 	public Affichage getAff() {
 		return aff;
 	}
-
-	/* public void createCaserne(Joueur joueur, Point pos) {
-		int tempsConstruc = 10;
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				tempspassee++;
-
-			}
-		}, 1000, 1000);
-		if (tempspassee == tempsConstruc) {
-			joueur.addBat(new Caserne(pos, joueur));
-			timer.cancel();
-			tempspassee = 0;
-		}
-	} */
 	
 	public void unitADeplacer() {
 		Case c = this.getAff().getPlateau()[posInitial.x][posInitial.y];
@@ -230,7 +309,6 @@ public class Etat {
 		}
 		else if(c.estOccupeeCombattante())
 			u = c.getCombattante();
-		System.out.println("pos :"+u.getPos());
 		u.setPosFinal(posfinal);
 		if(!u.isAlive()) {
 			u.start();

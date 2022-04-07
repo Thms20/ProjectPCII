@@ -13,6 +13,10 @@ public abstract class Unite extends Thread{
 	
 	public abstract void setPosFinal(Point p);
 	
+	public abstract int getVie();
+	
+	public abstract void setVie(int i);
+	
 //	public abstract void moveUnit();
 
 }

@@ -3,7 +3,7 @@ package Unites;
 import java.awt.*;
 
 public class Combattante extends Unite{
-    protected final int vie = 100;
+    protected int vie = 100;
     protected final int ATK = 10;
     private Point position ;
     private Point posFinal = null;
@@ -63,4 +63,16 @@ public class Combattante extends Unite{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public int getAttack(){
+        return this.ATK;
+    }
+
+    public int getVie(){
+        return this.vie;
+    }
+
+    public void setVie(int v){
+        this.vie = v;
+    }
 }
