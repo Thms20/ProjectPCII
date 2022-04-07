@@ -58,7 +58,7 @@ public class Case extends ZoneCliquable {
 
         //affichage graphique des ressources
         if(this.occupeeRessource) {
-        //	drawRessource(g);
+		drawRessource(g);
         }
       //affichage graphique des combattantes
         if(this.occupeCombattante) {
