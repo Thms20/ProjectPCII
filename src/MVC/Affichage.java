@@ -36,7 +36,7 @@ public class Affichage extends Grille {
 	    setAllUnit();
 		this.setBackground(Color.orange);
 		this.etat.threadUnit();
-	//	this.etat.threadRessource();
+		this.etat.threadRessource();
 		this.etat.setCombattantePlateau(new Combattante(new Point(12, 2)));
 		this.etat.setFourmilierePlateau(new Fourmiliere(new Point(14, 1)));
 		this.etat.setCasernePlateau(new Caserne(new Point(13, 0)));
