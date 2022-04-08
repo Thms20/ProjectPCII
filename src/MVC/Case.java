@@ -58,7 +58,7 @@ public class Case extends ZoneCliquable {
 
         //affichage graphique des ressources
         if(this.occupeeRessource) {
-		drawRessource(g);
+        	drawRessource(g);
         }
       //affichage graphique des combattantes
         if(this.occupeCombattante) {
@@ -264,10 +264,10 @@ public class Case extends ZoneCliquable {
         }
         else {
         	if(estOccupeFourmiliere()) {
-        		if(!(super.getEtat().getJoueurs().get(0).getNbNourritures() < 10)) {
-        			super.getEtat().getJoueurs().get(0).addUnite(new Ouvrier(new Point(14, 2)));
-        			super.getEtat().getJoueurs().get(0).setNbNourritures(-10);
-        			System.out.println("Vous generez une ouvriere : - 10 de nourriture ! Votre nombre de nourriture : " + super.getEtat().getJoueurs().get(0).getNbNourritures());
+        		if(!(super.getEtat().getJoueur().getNbNourritures() < 10)) {
+        			super.getEtat().getJoueur().addUnite(new Ouvrier(new Point(14, 2)));
+        			super.getEtat().getJoueur().setNbNourritures(-10);
+        			System.out.println("Vous generez une ouvriere : - 10 de nourriture ! Votre nombre de nourriture : " + super.getEtat().getJoueur().getNbNourritures());
         		}
         		else {
         			System.out.println("Vous n'avez pas assez de nourritures !");
@@ -275,10 +275,10 @@ public class Case extends ZoneCliquable {
         		
         	}
         	else if(estOccupeCaserne()) {
-        		if(!(super.getEtat().getJoueurs().get(0).getNbBois() < 20)) {
-        			super.getEtat().getJoueurs().get(0).addUnite(new Combattante(new Point(13, 1)));
-        			super.getEtat().getJoueurs().get(0).setNbBois(-20);
-        			System.out.println("Vous generez une ouvriere : - 20 de bois ! Votre nombre de bois : " + super.getEtat().getJoueurs().get(0).getNbBois());
+        		if(!(super.getEtat().getJoueur().getNbBois() < 20)) {
+        			super.getEtat().getJoueur().addUnite(new Combattante(new Point(13, 1)));
+        			super.getEtat().getJoueur().setNbBois(-20);
+        			System.out.println("Vous generez une ouvriere : - 20 de bois ! Votre nombre de bois : " + super.getEtat().getJoueur().getNbBois());
         		}
         		else {
         			System.out.println("Vous n'avez pas assez de bois !");
