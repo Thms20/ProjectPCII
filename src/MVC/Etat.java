@@ -1,91 +1,81 @@
 package MVC;
 
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Timer;
-
-import javax.swing.JOptionPane;
-
-import Batiments.Caserne;
-import Batiments.Fourmiliere;
-import Environnement.Carte;
-import Environnement.Ressource;
-import Environnement.typeRessource;
+import Batiments.*;
+import Environnement.*;
 import Joueurs.AIPlayer;
 import Joueurs.Joueur;
-import Unites.Combattante;
-import Unites.CombattanteAI;
-import Unites.Ouvrier;
-import Unites.Unite;
+import Unites.*;
+import javax.swing.JOptionPane;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Random;
+
+
 /**
- * 
+ *
  * @author Thomas, Arsene, Charlies
- * 
- * La classe Etat est la classe de modele du MVC. Il contient les informations qui caracterisent 
- * l'etat de l'affichage et un changement de ces informations entraine un changement au niveau 
+ *
+ * La classe Etat est la classe de modele du MVC. Il contient les informations qui caracterisent
+ * l'etat de l'affichage et un changement de ces informations entraine un changement au niveau
  * de l'interface graphique.
  */
 public class Etat {
 	private Joueur joueur;
 	private Affichage aff;
-	private AIPlayer ordi;
+	public AIPlayer ordi;
 	private ArrayList<Ressource> listRessource = new ArrayList<>();
-	
+
 	public Point posInitial = null; // Cet attribut permet de faire passer la position intiale d'une unite pour effectuer une action
 	public Point posfinal = null; // Cet attribut permet de definir dans une methode la destination finale d'une unite apres un clic gauche
-	
+
 	public Etat(Affichage a) {
-		aff = a;  // On recupere l'affichage 
+		aff = a;  // On recupere l'affichage
 
 		Joueur j1 = new Joueur();
 		joueur = j1; // On initialise et declare le joueur
 
-		
+
 		ordi = new AIPlayer(this); // On initialise l'AI qui est plus precisement un environnement contre lequel le joueur se bat
-		
+
 		initRessources();         // On initialise un certain nombre de ressource des le depart
 	}
-    
+
 	/**
 	 * @return le joueur
 	 */
 	public Joueur getJoueur() {
 		return joueur;
 	}
-	
-	
-    /**
-    * On initialise les ressources aleatoirement sur le terrain, il y a en tout 60 bois ou nourritures places
-    */
+
+
+	/**
+	 * On initialise les ressources aleatoirement sur le terrain, il y a en tout 60 bois ou nourritures places
+	 */
 	public void initRessources() {
 		Random rand = new Random();
-		int nbRessources = rand.nextInt(40) + 20;
+		int nbRessources = rand.nextInt(41) + 20;
 		while(nbRessources != 0) {
 			boolean tempB = true;
 			Ressource temp = new Ressource();
 			if(!this.listRessource.isEmpty()) {
-				for(Ressource res : this.listRessource)
-				{
-					if(temp.getPosition().x == res.getPosition().x && temp.getPosition().y == res.getPosition().y)
-					{
+				for(Ressource res : this.listRessource) {
+					if(temp.getPosition().x == res.getPosition().x && temp.getPosition().y == res.getPosition().y) {
 						tempB = false;
 						break;
 					}
 				}
 			}
-			if(tempB)
-			{
+			if(tempB) {
 				this.listRessource.add(temp);
-
 				nbRessources--;
 			}
 
 		}
 	}
-	
+
 	/**
-	 * Ce Thread est tres important car il permet de mettre a jour le nombre de ressource sur le plateau pour rester autour de 
+	 * Ce Thread est tres important car il permet de mettre a jour le nombre de ressource sur le plateau pour rester autour de
 	 * 60 ressources placees aleatoirement sur le plateau
 	 */
 	public void threadRessource()
@@ -110,23 +100,23 @@ public class Etat {
 					{
 						this.listRessource.add(r); // ajoute de la nouvelle ressource a la liste de ressources.
 						this.aff.getPlateau()[r.getPosition().x][r.getPosition().y].setRessource(r); // ajout de la nouvelles ressource au plateau de jeu.
-						this.aff.refreshReesources(); // appel pour actualiser l'affichage graphique.
+						this.aff.refresh(); // appel pour actualiser l'affichage graphique.
 					}
 				}
 				try
 				{
-					Thread.sleep(2500);
+					Thread.sleep(1750);
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}).start();
 	}
-	
+
 	/**
 	 * Ce Thread permet de gerer l'emplacement des unites et des differentes actualisations faites :
 	 * - suppression des unites sur les cases ou elles sont pour ensuite regarder leur emplacement (qui a peut-etre changer)
-	 * et les re-afficher 
+	 * et les re-afficher
 	 * - Si une unite de classe Ouvrier est sur une case avec une ressource alors elle la ramasse et met a jour les scores
 	 * du joueur
 	 * - Verification des conditions de fin de partie (win & lose)
@@ -138,12 +128,15 @@ public class Etat {
 					for(Case c : tabCase) {
 						if (c.estOccupeUnit()) {
 							c.removeUnit();
+							this.aff.repaint();
 						}
 						if (c.estOccupeeCombattante()) {
 							c.removeCombattante();
+							this.aff.repaint();
 						}
 						if (c.estOccupeeCombattanteAI()) {
 							c.removeCombattanteAI();
+							this.aff.repaint();
 						}
 					}
 				}
@@ -158,6 +151,7 @@ public class Etat {
 
 						if(c.estOccupeeRessource()) { // Je regarde si la case contient une ressource si c'est le cas alors je l'enleve et augmente le score du joueur
 							Ressource r = c.removeRessource();
+							this.listRessource.remove(r);
 							if (r.gettR() == typeRessource.bois) {
 								joueur.setNbBois(1);
 								System.out.println("nombre de bois : " + joueur.getNbBois());
@@ -166,11 +160,11 @@ public class Etat {
 								joueur.setNbNourritures(1);
 								System.out.println("nombre de nourriture : " + joueur.getNbNourritures());
 							}
-						} 
+						}
 					}
 				}
 
-               // Mise sur le plateau des unites de l'environnement
+				// Mise sur le plateau des unites de l'environnement
 				for(CombattanteAI u : ordi.getUnit()) {
 					Case c = this.aff.getPlateau()[u.getPos().x][u.getPos().y];
 					c.setCombattanteAI(u);
@@ -194,17 +188,18 @@ public class Etat {
 
 		}).start();
 	}
-	
+
 	/**
 	 * Ce thread permet de gerer l'attaque des troupes du joueur (classe Combattante) envers les unites de l'environnement seulement
-	 * si les deux unites sont à au plus une case de difference
+	 * si les deux unites sont Ã  au plus une case de difference
 	 */
 	public void threadAttaqueJoueur(){
 		new Thread(() -> {
 			while(true){
 				ArrayList<Unite> listUniteJ = this.joueur.getUnites();
 				ArrayList<CombattanteAI> listUniteE = this.ordi.getUnit();
-				ArrayList<Point> temp = new ArrayList<Point>();
+				ArrayList<Point> temp = new ArrayList<>();
+
 				for(Unite uJ : listUniteJ){
 					for(Unite uAI : listUniteE){
 						if(uJ instanceof Combattante){
@@ -221,7 +216,7 @@ public class Etat {
 						}
 					}
 				}
-				
+
 				// On supprime les unites dont la vie est tombe a 0
 				for(Point p : temp){
 					this.getAI().getUnit().remove(this.aff.getPlateau()[p.x][p.y].getCombattanteAI());
@@ -236,8 +231,8 @@ public class Etat {
 		}).start();
 	}
 
-	
-	
+
+
 	/**
 	 * Ce Thread permet de gerer l'attaque des unites de l'environnement sur les unites du joueur
 	 */
@@ -246,11 +241,11 @@ public class Etat {
 			while(true){
 				ArrayList<Unite> listUniteJ = this.joueur.getUnites();
 				ArrayList<CombattanteAI> listUniteE = this.ordi.getUnit();
-				ArrayList<Point> temp = new ArrayList<Point>();
+				ArrayList<Point> temp = new ArrayList<>();
 
 				for(Unite uAI : listUniteE){
 					for(Unite uJ : listUniteJ){
-						if(uJ instanceof Combattante){
+						if(uJ instanceof Combattante || uJ instanceof Ouvrier){
 							Point p1 = uJ.getPos();
 							Point p2 = uAI.getPos();
 							int xValide = Math.abs(p1.x - p2.x);
@@ -262,21 +257,9 @@ public class Etat {
 								}
 							}
 						}
-						else if(uJ instanceof Ouvrier){
-							Point p1 = uJ.getPos();
-							Point p2 = uAI.getPos();
-							int xValide = Math.abs(p1.x - p2.x);
-							int yValide = Math.abs(p1.y - p2.y);
-							if(xValide <= 1 && yValide <= 1){
-								uJ.setVie(uJ.getVie() - ((CombattanteAI) uAI).getAttack());
-								if(uJ.getVie() <= 0) {
-									temp.add(uJ.getPos());
-								}
-							}
-						}
 					}
 				}
-				
+
 				// On supprime du plateau les unites dont la vie est tombe a 0
 				for(Point p : temp){
 					Case c = this.aff.getPlateau()[p.x][p.y];
@@ -297,13 +280,12 @@ public class Etat {
 			}
 		}).start();
 	}
-	
-	
-    /**
-     * @return la liste des ressources sur le plateau de jeu
-     */
-	public ArrayList<Ressource> getListRessource()
-	{
+
+
+	/**
+	 * @return la liste des ressources sur le plateau de jeu
+	 */
+	public ArrayList<Ressource> getListRessource() {
 		return this.listRessource;
 	}
 
@@ -313,14 +295,14 @@ public class Etat {
 	public AIPlayer getAI() {
 		return ordi;
 	}
-	
+
 	/**
 	 * @return l'affichage
 	 */
 	public Affichage getAff() {
 		return aff;
 	}
-	
+
 	/**
 	 * Permet de deplacer les unites avec les positions initiale et finale definis grace a des clic dans la classe Case
 	 */
@@ -338,7 +320,7 @@ public class Etat {
 		}
 		posInitial = posfinal;
 	}
-	
+
 	/**
 	 * @param c
 	 * Permet d'ajouter une combattante sur le plateau et dans la liste du joueur
@@ -347,15 +329,16 @@ public class Etat {
 		this.joueur.addUnite(c);
 		this.aff.getPlateau()[c.getPos().x][c.getPos().y].setCombattante(c);
 	}
-	
+
 	/**
 	 * @param c
 	 * Permet de placer une unite de l'environnement sur le plateau
 	 */
 	public void setCombattanteAIPlateau(CombattanteAI c) {
+		this.ordi.getUnit().add(c);
 		this.aff.getPlateau()[c.getPos().x][c.getPos().y].setCombattanteAI(c);
 	}
-	
+
 	/**
 	 * @param f
 	 * Permet d'ajouter le batiment qui genere des Ouvrieres sur le plateau
@@ -364,7 +347,7 @@ public class Etat {
 		this.joueur.addBat(f);
 		this.aff.getPlateau()[f.getPosition().x][f.getPosition().y].setFourmiliere(f);
 	}
-	
+
 	/**
 	 * @param c
 	 * Permet d'ajouter le batiment qui genere des Combattantes sur le plateau
@@ -373,7 +356,7 @@ public class Etat {
 		this.joueur.addBat(c);
 		this.aff.getPlateau()[c.getPosition().x][c.getPosition().y].setCaserne(c);
 	}
-	
+
 	/**
 	 * Permet d'afficher une fenetre pour annoncer la victoire du joueur
 	 */
@@ -382,16 +365,13 @@ public class Etat {
 		String s = "Vous avez assez de rations pour l'hiver pour votre fourmiliere, BRAVO !";
 		fin.showConfirmDialog(aff, s, "Victoire!", JOptionPane.DEFAULT_OPTION);
 	}
-	
+
 	/**
-	 * Permet d'afficher une fenetre pour annoncer la defaite du joueur 
+	 * Permet d'afficher une fenetre pour annoncer la defaite du joueur
 	 */
 	public void lose() {
 		JOptionPane fin = new JOptionPane();
 		String s = "Vous avez perdu !";
 		fin.showConfirmDialog(aff, s, "Defaite !", JOptionPane.DEFAULT_OPTION);
 	}
-	
-	
-
 }

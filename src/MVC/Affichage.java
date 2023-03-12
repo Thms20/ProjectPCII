@@ -1,53 +1,40 @@
 package MVC;
 
-import java.awt.Color;
-import java.awt.Point;
-import java.util.ArrayList;
-
-import Batiments.Caserne;
-import Batiments.Fourmiliere;
-import Environnement.Ressource;
+import Environnement.*;
+import Batiments.*;
 import Unites.Combattante;
-import Unites.Unite;
+import Unites.CombattanteAI;
 
-/**
- * @author Thomas, Arsene, Charlies
- * 
- * La classe Affichage correspond � la Vue dans le modele MVC. Dans cette classe on cree graphiquement notre plateau de jeu avec
- * les elements dessus.  
- *
- */
+import java.awt.*;
+
 public class Affichage extends Grille {
-	private Etat etat = new Etat(this);
-
-	// Attributs : taille et tableau de cases
 	private Case[][] plateau;
+	private Etat etat = new Etat(this);
 
 	public Affichage(int taille) {
 		super(taille, taille);
 		this.plateau = new Case[taille][taille];
 
+		// Initialisation du plateau de jeu avec des cases cliquable (JPanel).
 		for (int x = 0; x < plateau.length; x++) {
 			for (int y = 0; y < plateau[x].length; y++) {
-				this.plateau[x][y] = new Case(etat, new Point(x, y)); // A chaque case on lui donne acces a l'Etat et on lui envoie sa position
+				Point p = new Point(x, y);
+				this.plateau[x][y] = new Case(etat, p);
 				ajouteElement(this.plateau[x][y]);
 			}
 		}
 		this.setAllRessources();
-	    setAllUnit();
 		this.setBackground(Color.orange);
-		
-		//Ici on demarre tous les Threads definis dans l'Etat et on place les batiments et une combattante sur le plateau de depart
-		this.etat.threadUnit();
-		this.etat.threadRessource();
-		this.etat.setCombattantePlateau(new Combattante(new Point(12, 2)));
-		this.etat.setFourmilierePlateau(new Fourmiliere(new Point(14, 1)));
-		this.etat.setCasernePlateau(new Caserne(new Point(13, 0)));
-		
-		this.etat.getAI().start();
+		this.etat.threadUnit(); // Lancement du thread contenu dans la methode threadUnit pour les deplacement des unites du joueurs et verification condition de win ou lose.
+		this.etat.threadRessource(); // Lancement du thread contenu dans la methode threadRessource pour le spawn continuel de ressource sur le plateau.
 
-		this.etat.threadAttaqueJoueur();
-		this.etat.threadAttaqueAI();
+		this.etat.setCombattantePlateau(new Combattante(new Point(13, 1))); // Ajout d'une combattante au joueur pour le debut de partie
+		this.etat.setFourmilierePlateau(new Fourmiliere(new Point(14, 1))); // Initialisation d'une Fourmilliére sur le plateau.
+		this.etat.setCasernePlateau(new Caserne(new Point(13, 0))); // Initialisation d'une Caserne sur le plateau.
+
+		this.etat.getAI().start(); // Lancement du thread de l'IA.
+		this.etat.threadAttaqueJoueur(); // Lancement du thread contenu dans la methode threadAttaqueJoueur pour gerer les attaques des combattantes du joueur.
+		this.etat.threadAttaqueAI(); // Lancement du thread contenu dans la methode threadAttqueAI pour gérer les attaques des unites de l'IA.
 	}
 
 	/**
@@ -58,54 +45,29 @@ public class Affichage extends Grille {
 			this.plateau[r.getPosition().x][r.getPosition().y].setRessource(r);
 		}
 	}
-	
-	
 
 	/**
 	 * Methode pour actualiser l'affichage graphique.
 	 */
-	public void refreshReesources()
-	{
-		for(Case[] tabCase : this.plateau)
-		{
-			for(Case c : tabCase)
-			{
-				// repaint seulement les cases ou il y'a une ressource.
-				if(c.estOccupeeRessource())
-					this.revalidate();
+	public void refresh() {
+		for (Case[] tabCase : this.plateau) {
+			for (Case c : tabCase) {
+				if (c.estOccupeeRessource())
+					c.repaint();
+				if(c.estOccupeUnit())
+					c.repaint();
+				if(c.estOccupeeCombattanteAI())
+					c.repaint();
+				if(c.estOccupeeCombattante())
 					c.repaint();
 			}
 		}
 	}
-	
+
 	/**
-	 * Permet d'afficher sur le plateau toutes les unites du joueur 
+	 * @return le plateur de jeu.
 	 */
-	public void setAllUnit() {
-		for(Unite u : etat.getJoueur().getUnites()) {
-			this.plateau[u.getPos().x][u.getPos().y].setUnit(u);
-			
-		}
-	}
-	
-	/**
-	 * Permet de repaint une case qui contient une unite 
-	 */
-	public void refreshUnit() {
-		for(Case[] tabCase : this.plateau) {
-			for(Case c : tabCase) {
-				if(c.estOccupeUnit()) {
-					c.repaint();
-				}
-			}
-		}
-	}
-	
-    /**
-     * @return le plateau de jeu
-     */
 	public Case[][] getPlateau() {
 		return plateau;
 	}
-
 }
